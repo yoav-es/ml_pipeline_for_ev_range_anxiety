@@ -27,10 +27,7 @@ def handle_missing_values(df: pd.DataFrame, threshold: float = 0.05, discrete_th
         if pd.api.types.is_numeric_dtype(df[col]):
             non_na = df[col].dropna()
             is_integer_like = (non_na % 1 == 0).all()
-            is_discrete = is_integer_like and (
-                non_na.nunique() <= discrete_threshold
-            )
-
+            is_discrete = is_integer_like and (non_na.nunique() <= discrete_threshold)
             if is_discrete:
                 # Use median rounded to integer for discrete/ordinal ratings
                 fill_val = round(df[col].median())
@@ -106,6 +103,8 @@ def plot_distributions(
     plt.show()
 
 
+
+
 def remove_outliers_by_zscore(df: pd.DataFrame,  cols: list | None, threshold: float = 3.0) -> pd.DataFrame:
     """Removes rows containing Z-score outliers from numeric columns.
 
@@ -141,5 +140,3 @@ def remove_outliers_by_zscore(df: pd.DataFrame,  cols: list | None, threshold: f
     mask = (z_scores < threshold).all(axis=1)
 
     return df_clean[mask].reset_index(drop=True)
-
-

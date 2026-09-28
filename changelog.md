@@ -13,3 +13,9 @@
 Added and tested K nearest neighbors, and Xgboost pipelines. noticed a problem with gpu usage integration, wrote some findings.  
 
 26/09/26 - refactored the analysis results and conclusions.
+
+28/09/26 
+- Added GPU execution wrapper decorator for conditional hardware selection during model training 
+- Refactored core pipeline code into modular backend functions.
+- Verified evaluation results, model metrics, and summary tables.
+- Refactored the analysis results, insights, and final conclusions.
