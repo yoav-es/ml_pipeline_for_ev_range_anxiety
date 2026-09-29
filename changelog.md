@@ -1,21 +1,40 @@
-07/09/26: Initial repository creation and baseline project setup.
+# Changelog
 
-19/09/26: Refined ETL Stage, Added histograms and z score for outlier analysis, converted etl to a more ML format, created Pipline template
+## 07/09/26
 
-07/09/26: Initial repository creation and baseline project setup.
+- Initial repository creation and baseline project setup.
 
-19/09/26: Refined ETL Stage, Added histograms and z score for outlier analysis, converted etl to a more ML format, created Pipline template
+## 19/09/26
 
-22/09/26: Added Random Forest benchmark model pipeline with automated hyperparameter tuning via RandomizedSearchCV and Recursive Feature Elimination (RFE). Incorporated the `environmental_concern_level` feature, split numerical and categorical preprocessing explicitly, and implemented stratified train-test splitting. Added out-of-fold cross-validation for custom classification threshold optimization alongside full evaluation metrics and confusion matrix generation.
+- Refined the ETL stage: histograms and z-score outlier analysis.
+- Converted ETL toward an ML-oriented format and added a pipeline template.
 
-25/09/26: Refined ETL Stage, Added histograms and z score for outlier analysis, converted etl to a more ML format, created Pipline template
+## 22/09/26
 
-Added and tested K nearest neighbors, and Xgboost pipelines. noticed a problem with gpu usage integration, wrote some findings.  
+- Added a Random Forest benchmark pipeline with RandomizedSearchCV and RFE.
+- Included `environmental_concern_level`.
+- Split numerical and categorical preprocessing explicitly.
+- Added a stratified train-test split.
+- Added out-of-fold cross-validation for classification threshold optimization, plus evaluation metrics and confusion matrices.
 
-26/09/26 - refactored the analysis results and conclusions.
+## 25/09/26
 
-28/09/26 
-- Added GPU execution wrapper decorator for conditional hardware selection during model training 
-- Refactored core pipeline code into modular backend functions.
-- Verified evaluation results, model metrics, and summary tables.
-- Refactored the analysis results, insights, and final conclusions.
+- Added and tested K-Nearest Neighbors and XGBoost pipelines.
+- Documented GPU integration issues and findings.
+
+## 26/09/26
+
+- Refactored analysis results and conclusions.
+
+## 28/09/26
+
+- Added a GPU execution wrapper for conditional hardware selection during training.
+- Moved core pipeline helpers into modular backend functions under `src/`.
+- Rechecked evaluation results, metrics, and summary tables.
+- Refactored analysis insights and final conclusions.
+
+## 29/09/26
+
+- Rewrote the README to match the actual project layout, data path, and setup steps.
+- Fixed `requirements.txt` (correct Jupyter package name; added packages imported by `src/ml_utils.py`).
+- Deduplicated and cleaned this changelog.

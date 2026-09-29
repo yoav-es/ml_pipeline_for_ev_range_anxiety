@@ -1,6 +1,4 @@
 import functools
-import subprocess
-from cpuinfo import get_cpu_info
 from sklearnex import config_context
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (
@@ -11,7 +9,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 #Global Variable of gpu acceleration
-USE_GPU = True
+USE_GPU = False
 
 def set_gpu_enabled(enabled: bool):
 

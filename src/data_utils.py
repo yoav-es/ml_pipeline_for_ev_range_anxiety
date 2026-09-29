@@ -3,49 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def handle_missing_values(df: pd.DataFrame, threshold: float = 0.05, discrete_threshold: int = 20) -> pd.DataFrame:
-    """Handles missing data based on column-level missingness thresholds.
-
-    - For columns with > threshold missingness: drops rows with NaNs in these columns.
-    - For continuous numeric columns: imputes with median (robust to outliers).
-    - For discrete/integer numeric columns: imputes with median and rounds to integer.
-    - For categorical fields: imputes with mode.
-    """
-    df = df.copy()
-
-    # 1. Drop rows for columns exceeding the missingness threshold
-    missing_ratios = df.isna().mean()
-    high_missing_cols = missing_ratios[missing_ratios > threshold].index
-
-    if not high_missing_cols.empty:
-        df = df.dropna(subset=high_missing_cols)
-
-    # 2. Recalculate missing columns after row dropping
-    remaining_missing_cols = df.columns[df.isna().any()]
-
-    for col in remaining_missing_cols:
-        if pd.api.types.is_numeric_dtype(df[col]):
-            non_na = df[col].dropna()
-            is_integer_like = (non_na % 1 == 0).all()
-            is_discrete = is_integer_like and (non_na.nunique() <= discrete_threshold)
-            if is_discrete:
-                # Use median rounded to integer for discrete/ordinal ratings
-                fill_val = round(df[col].median())
-                df[col] = df[col].fillna(fill_val).astype("Int64")
-            else:
-                # Use median for continuous variables to avoid outlier sensitivity
-                df[col] = df[col].fillna(df[col].median())
-        else:
-            mode_series = df[col].mode()
-            fill_val = (
-                mode_series.iloc[0] if not mode_series.empty else "Unknown"
-            )
-            df[col] = df[col].fillna(fill_val)
-
-    return df
-
-
-
 
 def plot_distributions(
     df: pd.DataFrame, cols: list | None, discrete_threshold: int = 10

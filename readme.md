@@ -1,67 +1,100 @@
-# EV Adoption Prediction Pipeline
+# EV Range Anxiety and Adoption Prediction
 
-A machine learning pipeline to analyze and predict electric vehicle (EV) adoption based on user demographics, behavioral, and vehicle characteristics. The project delivers a reproducible workflow for identifying key predictors associated with willingness to buy an EV.
+A machine learning pipeline that predicts whether a person is likely to buy an electric vehicle (`will_buy_ev`) from demographics, commute distance, charging access, range anxiety, and related behavioral features.
 
-## Quick Highlights
+The main workflow lives in a Jupyter notebook. Shared helpers for plotting, outlier filtering, and model training sit in `src/`.
 
-- **Notebook**: `notebooks/ev_adoption_analysis.ipynb` — End-to-end data analysis, modeling, and results
-- **Package**: `ev_pipeline/` — Modular helpers for data loading, preprocessing, feature engineering, and modeling
-- **Environment**: Python 3.10+ with core scientific and ML libraries
-- **Execution**: Supports local CLI and interactive Jupyter workflows
+## Highlights
 
-## Overview
+- End-to-end notebook: EDA, preprocessing, training, and evaluation
+- Four model pipelines: Logistic Regression, Random Forest, K-Nearest Neighbors, and XGBoost
+- Stratified train/test split, class-imbalance handling, and hyperparameter search (GridSearchCV / RandomizedSearchCV)
+- Evaluation with accuracy, precision, recall, F1, ROC AUC, and confusion matrices
+- Optional Intel GPU offload for sklearn-compatible estimators (off by default; toggle in the notebook)
 
-- The goal of this project is to analyze and predict EV adoption by evaluating user demographics, daily commute distances, and range anxiety levels through a robust machine learning pipeline.
-   By examining behavioral patterns, coverage distributions, and metric alignments, the model identifies key predictive features that influence the likelihood of a person buying an EV. Ultimately, these insights provide actionable strategies to inform vehicle manufacturing, infrastructure development, and policy decisions.
+## Research question
 
+How do **range anxiety level** and **daily commute distance**—together with charging access and other user attributes—relate to the likelihood of EV adoption?
 
-## Features
+## Project structure
 
-- End-to-end ML pipeline with modular preprocessing and feature engineering
-- Multiple model pipelines (Logistic Regression, Random Forest, KNN, XGBoost) with hyperparameter tuning
-- Automated feature selection and threshold optimization
-- Robust evaluation metrics and confusion matrix reporting
-
-## Project Structure
-
-- `notebooks/ev_adoption_analysis.ipynb` — Primary interactive analysis notebook
-- `ev_pipeline/` — Python source package containing modular helpers (data loading, processing, analysis, visualization)
-- `tests/` — Unit and integration tests
-- `scripts/` — Helper and automation scripts
-- `requirements.txt` / `pyproject.toml` — Dependency and build setup files
+```
+ml_pipeline.ipynb      End-to-end analysis and modeling notebook
+src/
+  data_utils.py        Distribution plots and z-score outlier filtering
+  ml_utils.py          Pipeline construction, training wrapper, evaluation
+data/                  Local dataset directory (not committed; see Data below)
+requirements.txt       Pinned Python dependencies
+changelog.md           Project history
+license                MIT License
+```
 
 ## Requirements
 
-- Python 3.10+
-- numpy
-- pandas
-- scikit-learn
-- scipy
-- xgboost
-- matplotlib
-- seaborn
-- jupyter-notebook
+- Python 3.11+ recommended (matches the pinned scientific stack)
+- Dependencies listed in `requirements.txt` (scikit-learn, XGBoost, pandas, numpy, scipy, matplotlib, seaborn, Jupyter, Intel Extension for Scikit-learn)
 
-## Installation & Setup
+## Data
 
-1. Clone the repository:
-   ```bash
-   git clone [repository_url]
-   cd [repository_directory]
-   ```
+The notebook loads:
 
-2. Create a virtual environment and install dependencies:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate    # Windows PowerShell: .venv\Scripts\Activate.ps1
-   pip install -r requirements.txt
-   pip install -e .             # Optional: install package in editable mode
-   ```
+```text
+data/ev_adoption.csv
+```
 
-## Running the Notebook
+The dataset is **proprietary**, so `data/` and CSV files are gitignored and are not in the public repository. Put your local copy at `data/ev_adoption.csv` before running the notebook.
 
-Launch the interactive Jupyter notebook environment:
+Expected columns include `age`, `gender`, `annual_income_usd`, `city_type`, `daily_commute_km`, charging-related fields, `environmental_concern_level`, `range_anxiety_level`, and the target `will_buy_ev`.
+
+## GPU acceleration
+
+Training uses CPU by default (`USE_GPU = False` in `src/ml_utils.py`). In the first code cell of `ml_pipeline.ipynb`, call `set_gpu_enabled(True)` to try Intel GPU offload via `scikit-learn-intelex`, or leave `set_gpu_enabled(False)` for CPU. If GPU offload fails, training falls back to CPU automatically. This mainly affects sklearn estimators; XGBoost is not accelerated the same way.
+
+## Installation
 
 ```bash
-jupyter notebook ml_pipeline
+git clone https://github.com/yoav-es/ml_pipeline_for_ev_range_anxiety.git
+cd ml_pipeline_for_ev_range_anxiety
 ```
+
+If you cloned the local folder name instead:
+
+```bash
+cd ml_pipeline_for_ev_range_anxiety_prediciton
+```
+
+Create a virtual environment and install dependencies:
+
+```bash
+python -m venv .venv
+```
+
+```bash
+# Linux / macOS
+source .venv/bin/activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the notebook from the project root so the `data/` path and `src/` imports resolve:
+
+```bash
+jupyter notebook ml_pipeline.ipynb
+```
+
+## Pipeline overview
+
+1. **EDA** — Normalize column names, inspect missing values, filter z-score outliers on selected numeric columns, plot distributions.
+2. **Features** — Predictors such as income, city type, commute distance, charging access, range anxiety, and environmental concern; target is `will_buy_ev` (Yes/No).
+3. **Preprocessing** — `ColumnTransformer` with `SimpleImputer` (mean for numeric, most frequent for categorical), one-hot encoding, and `StandardScaler`.
+4. **Models** — Logistic Regression with RFE, Random Forest, KNN with RFE, XGBoost with RFE; 5-fold CV scoring on F1.
+5. **Results** — Logistic Regression is the strongest overall trade-off on the reported run (highest F1 and ROC AUC). KNN accuracy is inflated by the ~83% / ~17% class imbalance.
+
+## License
+
+MIT. See `license`.
